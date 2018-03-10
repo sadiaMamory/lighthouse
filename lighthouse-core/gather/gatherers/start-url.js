@@ -55,7 +55,16 @@ class StartUrl extends Gatherer {
             if (response.url === startUrl) {
               options.driver.off('Network.responseReceived', responseReceived);
 
-              resolve({
+              if (!response.fromServiceWorker) {
+                return resolve({
+                  statusCode: -1,
+                  debugString: msgWithExtraDebugString(
+                    'Unable to fetch start URL via service worker'
+                  ),
+                });
+              }
+
+              return resolve({
                 statusCode: response.status,
                 debugString: '',
               });
