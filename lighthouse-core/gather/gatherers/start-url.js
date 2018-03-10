@@ -6,7 +6,6 @@
 'use strict';
 
 const Gatherer = require('./gatherer');
-const URL = require('../../lib/url-shim');
 const manifestParser = require('../../lib/manifest-parser');
 
 class StartUrl extends Gatherer {
@@ -24,7 +23,6 @@ class StartUrl extends Gatherer {
       .then(manifest => {
         if (!manifest || !manifest.value) {
           const detailedMsg = manifest && manifest.debugString;
-          console.log(manifest);
 
           if (detailedMsg) {
             const message = `Error fetching web app manifest: ${detailedMsg}`;
@@ -54,7 +52,6 @@ class StartUrl extends Gatherer {
 
         return (new Promise(resolve => {
           options.driver.on('Network.responseReceived', function responseReceived({response}) {
-            console.log(response);
             if (response.url === startUrl) {
               options.driver.off('Network.responseReceived', responseReceived);
 
@@ -68,11 +65,12 @@ class StartUrl extends Gatherer {
           options.driver.goOffline(options)
             .then(() => this.executeFetchRequest(options.driver, startUrl))
             .then(() => options.driver.goOnline(options))
-            .catch((err) => {
-              console.log(err);
+            .catch(() => {
               resolve({
                 statusCode: -1,
-                debugString: msgWithExtraDebugString('Unable to fetch start URL via service worker'),
+                debugString: msgWithExtraDebugString(
+                  'Unable to fetch start URL via service worker'
+                ),
               });
             });
         }));

@@ -43,13 +43,27 @@ describe('Start-url gatherer', () => {
   it('returns an artifact set to -1 when offline loading fails', () => {
     const startUrlGatherer = new StartUrlGatherer();
     const startUrlGathererWithQueryString = new StartUrlGatherer();
+    const throwOnEvaluate = (mockDriver) => {
+      mockDriver.on = () => {};
+      mockDriver.evaluateAsync = () => {
+        throw new Error({
+          TypeError: 'Failed to fetch',
+          __failedInBrowser: true,
+          name: 'TypeError',
+          message: 'Failed to fetch',
+        });
+      };
+
+      return mockDriver;
+    };
+
     const options = {
       url: 'https://do-not-match.com/',
-      driver: wrapSendCommand(mockDriver, 'https://do-not-match.com/', -1),
+      driver: throwOnEvaluate(wrapSendCommand(mockDriver, 'https://do-not-match.com/', -1)),
     };
     const optionsWithQueryString = {
       url: 'https://ifixit-pwa.appspot.com/?history',
-      driver: wrapSendCommand(mockDriver, 'https://ifixit-pwa.appspot.com/?history', -1),
+      driver: throwOnEvaluate(wrapSendCommand(mockDriver, 'https://ifixit-pwa.appspot.com/?history', -1)),
     };
 
     return Promise.all([
