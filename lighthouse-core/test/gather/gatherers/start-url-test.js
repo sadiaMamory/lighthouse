@@ -21,11 +21,11 @@ const mockDriver = {
   off() {},
 };
 
-const wrapSendCommand = (mockDriver, url, status = 200) => {
+const wrapSendCommand = (mockDriver, url, status = 200, fromServiceWorker = false) => {
   mockDriver = Object.assign({}, mockDriver);
   mockDriver.evaluateAsync = () => Promise.resolve();
   mockDriver.on = (name, cb) => {
-    cb({response: {status, url}});
+    cb({response: {status, url, fromServiceWorker}});
   };
 
   mockDriver.getAppManifest = () => {
@@ -82,11 +82,11 @@ describe('Start-url gatherer', () => {
     const startUrlGathererWithFragment = new StartUrlGatherer();
     const options = {
       url: 'https://ifixit-pwa.appspot.com/',
-      driver: wrapSendCommand(mockDriver, 'https://ifixit-pwa.appspot.com/'),
+      driver: wrapSendCommand(mockDriver, 'https://ifixit-pwa.appspot.com/', 200, true),
     };
     const optionsWithQueryString = {
       url: 'https://ifixit-pwa.appspot.com/#/history',
-      driver: wrapSendCommand(mockDriver, 'https://ifixit-pwa.appspot.com/#/history'),
+      driver: wrapSendCommand(mockDriver, 'https://ifixit-pwa.appspot.com/#/history', 200, true),
     };
 
     return Promise.all([
