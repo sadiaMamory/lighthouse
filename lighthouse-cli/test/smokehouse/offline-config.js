@@ -30,7 +30,6 @@ module.exports = {
       'label',
       'tabindex',
       'content-width',
-      'cache-start-url',
     ],
   },
 };
