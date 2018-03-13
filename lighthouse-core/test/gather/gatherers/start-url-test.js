@@ -43,6 +43,7 @@ describe('Start-url gatherer', () => {
   it('returns an artifact set to -1 when offline loading fails', () => {
     const startUrlGatherer = new StartUrlGatherer();
     const startUrlGathererWithQueryString = new StartUrlGatherer();
+    const startUrlGathererWithResponseNotFromSW = new StartUrlGatherer();
     const throwOnEvaluate = (mockDriver) => {
       mockDriver.on = () => {};
       mockDriver.evaluateAsync = () => {
@@ -65,19 +66,26 @@ describe('Start-url gatherer', () => {
       url: 'https://ifixit-pwa.appspot.com/?history',
       driver: throwOnEvaluate(wrapSendCommand(mockDriver, 'https://ifixit-pwa.appspot.com/?history', -1)),
     };
+    const optionsWithResponseNotFromSW = {
+      url: 'https://do-not-match.com/',
+      driver: wrapSendCommand(mockDriver, 'https://do-not-match.com/', 200),
+    };
 
     return Promise.all([
       startUrlGatherer.afterPass(options),
       startUrlGathererWithQueryString.afterPass(optionsWithQueryString),
-    ]).then(([artifact, artifactWithQueryString]) => {
+      startUrlGathererWithResponseNotFromSW.afterPass(optionsWithResponseNotFromSW),
+    ]).then(([artifact, artifactWithQueryString, artifactWithResponseNotFromSW]) => {
       assert.equal(artifact.statusCode, -1);
       assert.ok(artifact.debugString, 'did not set debug string');
       assert.equal(artifactWithQueryString.statusCode, -1);
       assert.ok(artifactWithQueryString.debugString, 'did not set debug string');
+      assert.equal(artifactWithResponseNotFromSW.statusCode, -1);
+      assert.equal(artifactWithResponseNotFromSW.debugString, 'Unable to fetch start URL via service worker');
     });
   });
 
-  it('returns an artifact set to 200 when offline loading succeeds', () => {
+  it('returns an artifact set to 200 when offline loading from service worker succeeds', () => {
     const startUrlGatherer = new StartUrlGatherer();
     const startUrlGathererWithFragment = new StartUrlGatherer();
     const options = {
@@ -99,6 +107,43 @@ describe('Start-url gatherer', () => {
   });
 
   it('returns a debugString when manifest cannot be found', () => {
+    const driver = Object.assign({}, mockDriver);
+    const startUrlGatherer = new StartUrlGatherer();
+    const options = {
+      url: 'https://ifixit-pwa.appspot.com/',
+      driver,
+    };
+
+    driver.getAppManifest = () => Promise.resolve(null);
+
+    return startUrlGatherer.afterPass(options, tracingData)
+      .then(artifact => {
+        assert.equal(artifact.debugString,
+          `No usable web app manifest found on page ${options.url}`);
+      });
+  });
+
+  it('returns a debugString when manifest cannot be parsed', () => {
+    const driver = Object.assign({}, mockDriver);
+    const startUrlGatherer = new StartUrlGatherer();
+    const options = {
+      url: 'https://ifixit-pwa.appspot.com/',
+      driver,
+    };
+
+    driver.getAppManifest = () => Promise.resolve({
+      data: 'this is invalid',
+      url: 'https://ifixit-pwa.appspot.com/manifest.json',
+    });
+
+    return startUrlGatherer.afterPass(options, tracingData)
+      .then(artifact => {
+        assert.equal(artifact.debugString,
+          `Error fetching web app manifest: ERROR: file isn't valid JSON: SyntaxError: Unexpected token h in JSON at position 1`);
+      });
+  });
+
+  it('returns a debugString when start_url cannot be found', () => {
     const startUrlGatherer = new StartUrlGatherer();
     const options = {
       url: 'https://ifixit-pwa.appspot.com/',

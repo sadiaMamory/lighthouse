@@ -16,7 +16,6 @@ class StartUrl extends Gatherer {
   }
 
   afterPass(options) {
-    const msgWithExtraDebugString = msg => this.debugString ? `${msg}: ${this.debugString}` : msg;
     return options.driver.goOnline(options)
       .then(() => options.driver.getAppManifest())
       .then(response => response && manifestParser(response.data, response.url, options.url))
@@ -25,16 +24,16 @@ class StartUrl extends Gatherer {
           const detailedMsg = manifest && manifest.debugString;
 
           if (detailedMsg) {
-            const message = `Error fetching web app manifest: ${detailedMsg}`;
+            const debugString = `Error fetching web app manifest: ${detailedMsg}`;
             return {
               statusCode: -1,
-              debugString: msgWithExtraDebugString(message),
+              debugString,
             };
           } else {
-            const message = `No usable web app manifest found on page ${options.url}`;
+            const debugString = `No usable web app manifest found on page ${options.url}`;
             return {
               statusCode: -1,
-              debugString: msgWithExtraDebugString(message),
+              debugString,
             };
           }
         }
@@ -44,7 +43,7 @@ class StartUrl extends Gatherer {
           // Therefore, we only set the debugString here and continue with the fetch.
           return {
             statusCode: -1,
-            debugString: msgWithExtraDebugString(manifest.value.start_url.debugString),
+            debugString: manifest.value.start_url.debugString,
           };
         }
 
@@ -58,9 +57,7 @@ class StartUrl extends Gatherer {
               if (!response.fromServiceWorker) {
                 return resolve({
                   statusCode: -1,
-                  debugString: msgWithExtraDebugString(
-                    'Unable to fetch start URL via service worker'
-                  ),
+                  debugString: 'Unable to fetch start URL via service worker',
                 });
               }
 
@@ -77,9 +74,7 @@ class StartUrl extends Gatherer {
             .catch(() => {
               resolve({
                 statusCode: -1,
-                debugString: msgWithExtraDebugString(
-                  'Unable to fetch start URL via service worker'
-                ),
+                debugString: 'Unable to fetch start URL via service worker',
               });
             });
         }));
