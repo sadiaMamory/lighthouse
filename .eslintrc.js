@@ -68,7 +68,7 @@ module.exports = {
     'arrow-parens': 0,
   },
   parserOptions: {
-    ecmaVersion: 6,
+    ecmaVersion: 8,
     ecmaFeatures: {
       globalReturn: true,
       jsx: false,

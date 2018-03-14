@@ -318,9 +318,15 @@ class Runner {
     const computedArtifacts = {};
     const filenamesToSkip = [
       'computed-artifact.js', // the base class which other artifacts inherit
+      'metrics', // the sub folder that contains metric names
     ];
 
-    require('fs').readdirSync(__dirname + '/gather/computed').forEach(function(filename) {
+    const fileList = [
+      ...fs.readdirSync(path.join(__dirname, './gather/computed')),
+      ...fs.readdirSync(path.join(__dirname, './gather/computed/metrics')).map(f => `metrics/${f}`),
+    ];
+
+    fileList.forEach(function(filename) {
       if (filenamesToSkip.includes(filename)) return;
 
       // Drop `.js` suffix to keep browserify import happy.
@@ -330,6 +336,7 @@ class Runner {
       // define the request* function that will be exposed on `artifacts`
       computedArtifacts['request' + artifact.name] = artifact.request.bind(artifact);
     });
+
     return computedArtifacts;
   }
 

@@ -6,7 +6,8 @@
 'use strict';
 
 const Audit = require('../audit');
-const PredictivePerf = require('../predictive-perf');
+const ConsistentlyInteractive = require('../../gather/computed/metrics/consistently-interactive');
+const NetworkAnalysis = require('../../gather/computed/network-analysis');
 const LoadSimulator = require('../../lib/dependency-graph/simulator/simulator.js');
 
 const KB_IN_BYTES = 1024;
@@ -120,8 +121,8 @@ class UnusedBytes extends Audit {
     });
 
     const savingsOnTTI = Math.max(
-      PredictivePerf.getLastLongTaskEndTime(simulationBeforeChanges.nodeTiming) -
-        PredictivePerf.getLastLongTaskEndTime(simulationAfterChanges.nodeTiming),
+      ConsistentlyInteractive.getLastLongTaskEndTime(simulationBeforeChanges.nodeTiming) -
+        ConsistentlyInteractive.getLastLongTaskEndTime(simulationAfterChanges.nodeTiming),
       0
     );
 
@@ -135,7 +136,11 @@ class UnusedBytes extends Audit {
    * @return {!AuditResult}
    */
   static createAuditResult(result, graph) {
-    const simulatorOptions = PredictivePerf.computeRTTAndServerResponseTime(graph);
+    const records = [];
+    graph.traverse(node => node.record && records.push(node.record));
+    // TODO(phulce): use rtt/throughput from config.settings instead of defaults
+    const simulatorOptions = NetworkAnalysis.computeRTTAndServerResponseTime(records);
+    delete simulatorOptions.rtt;
     const simulator = new LoadSimulator(graph, simulatorOptions);
 
     const debugString = result.debugString;
