@@ -20,7 +20,6 @@ describe('Num DOM nodes audit', () => {
     },
   };
 
-  const snippet = '';
   it('calculates score hitting top of distribution', () => {
     const auditResult = DOMSize.audit(artifact);
     assert.equal(auditResult.score, 1);
