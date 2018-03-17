@@ -26,8 +26,8 @@ describe('Num DOM nodes audit', () => {
     assert.equal(auditResult.rawValue, numNodes);
     assert.equal(auditResult.displayValue, `${numNodes.toLocaleString()} nodes`);
     assert.equal(auditResult.details.items[0].totalNodes, numNodes.toLocaleString());
-    assert.equal(auditResult.details.items[0].depth, `1 (html > body > div > span)`);
-    assert.equal(auditResult.details.items[0].width, `2 (html > body)`);
+    assert.equal(auditResult.details.items[0].depth, '1');
+    assert.equal(auditResult.details.items[0].width, '2');
   });
 
   it('calculates score hitting mid distribution', () => {

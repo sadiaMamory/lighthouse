@@ -54,8 +54,6 @@ class DOMSize extends Audit {
    */
   static audit(artifacts) {
     const stats = artifacts.DOMStats;
-    const depthSnippet = stats.depth.pathToElement.join(' > ');
-    const widthSnippet = stats.width.pathToElement.join(' > ');
 
     // Use the CDF of a log-normal distribution for scoring.
     //   <= 1500: score≈1
@@ -69,15 +67,20 @@ class DOMSize extends Audit {
 
     const headings = [
       {key: 'totalNodes', itemType: 'text', text: 'Total DOM Nodes'},
-      {key: 'depth', itemType: 'text', text: 'DOM Depth'},
+      {key: 'depth', itemType: 'text', text: 'Maximum DOM Depth'},
       {key: 'width', itemType: 'text', text: 'Maximum Children'},
     ];
 
     const items = [
       {
         totalNodes: Util.formatNumber(stats.totalDOMNodes),
-        depth: `${Util.formatNumber(stats.depth.max)} (${depthSnippet})`,
-        width: `${Util.formatNumber(stats.width.max)} (${widthSnippet})`,
+        depth: Util.formatNumber(stats.depth.max),
+        width: Util.formatNumber(stats.width.max),
+      },
+      {
+        totalNodes: '',
+        depth: stats.depth.snippet,
+        width: stats.width.snippet,
       },
     ];
 
