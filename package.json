@@ -48,6 +48,8 @@
     "plots-smoke": "bash plots/test/smoke.sh",
     "changelog": "conventional-changelog --config ./build/changelog-generator/index.js --infile changelog.md --same-file",
     "type-check": "tsc -p .",
+    "update:artifacts": "node lighthouse-core/scripts/update-report-fixtures.js -G",
+    "update:json": "node lighthouse-core/scripts/update-report-fixtures.js -A",
     "mixed-content": "./lighthouse-cli/index.js --chrome-flags='--headless' --config-path=./lighthouse-core/config/mixed-content.js"
   },
   "devDependencies": {
