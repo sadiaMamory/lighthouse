@@ -49,7 +49,7 @@
     "changelog": "conventional-changelog --config ./build/changelog-generator/index.js --infile changelog.md --same-file",
     "type-check": "tsc -p .",
     "update:artifacts": "node lighthouse-core/scripts/update-report-fixtures.js -G",
-    "update:json": "node lighthouse-core/scripts/update-report-fixtures.js -A",
+    "update:json": "node ./lighthouse-cli -A=./lighthouse-cli/test/sample_artifacts --output=json --output-path=./lighthouse-core/test/results/sample_v2.json http://localhost/dobetterweb/dbw_tester.html",
     "mixed-content": "./lighthouse-cli/index.js --chrome-flags='--headless' --config-path=./lighthouse-core/config/mixed-content.js"
   },
   "devDependencies": {
