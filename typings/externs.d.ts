@@ -4,139 +4,110 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-export as namespace LH;
+declare namespace LH {
 
-export interface Flags {
-  _: string[];
-  port: number;
-  chromeFlags: string;
-  output: any;
-  outputPath: string;
-  saveAssets: boolean;
-  view: boolean;
-  maxWaitForLoad: number;
-  logLevel: string;
-  hostname: string;
-  blockedUrlPatterns: string[];
-  extraHeaders: string;
-  enableErrorReporting: boolean;
-  listAllAudits: boolean;
-  listTraceCategories: boolean;
-  auditMode: boolean;
-  gatherMode: boolean;
-  configPath?: string;
-  perf: boolean;
-  mixedContent: boolean;
-  verbose: boolean;
-  quiet: boolean;
-}
+  export interface Flags {
+    _: string[];
+    port: number;
+    chromeFlags: string;
+    output: any;
+    outputPath: string;
+    saveAssets: boolean;
+    view: boolean;
+    maxWaitForLoad: number;
+    logLevel: string;
+    hostname: string;
+    blockedUrlPatterns: string[];
+    extraHeaders: string;
+    enableErrorReporting: boolean;
+    listAllAudits: boolean;
+    listTraceCategories: boolean;
+    auditMode: boolean;
+    gatherMode: boolean;
+    configPath?: string;
+    perf: boolean;
+    mixedContent: boolean;
+    verbose: boolean;
+    quiet: boolean;
+  }
 
-export interface Config {}
+  export interface Config {}
 
-export interface AuditResult {
-  rawValue: boolean | number;
-  displayValue?: string;
-  debugString?: string;
-  score?: number;
-  optimalValue: number | string;
-  extendedInfo?: {value: string};
-}
+  export interface Results {
+    url: string;
+    audits: LH.Audit.Results;
+    lighthouseVersion: string;
+    artifacts?: Object;
+    initialUrl: string;
+    generatedTime: string;
+  }
 
-export interface AuditResults {
-  [metric: string]: AuditResult;
-}
+  export interface LaunchedChrome {
+    pid: number;
+    port: number;
+    kill: () => Promise<{}>;
+  }
 
-export interface AuditFullResult {
-  rawValue: boolean | number;
-  displayValue: string;
-  debugString?: string;
-  score: number;
-  scoreDisplayMode: string;
-  error?: boolean;
-  description: string;
-  name: string;
-  helpText?: string;
-  extendedInfo?: {value: string};
-}
+  export interface LighthouseError extends Error {
+    code?: string;
+    friendlyMessage?: string;
+  }
 
-export interface AuditFullResults {
-  [metric: string]: AuditFullResult;
-}
+  export interface TraceEvent {
+    name: string;
+    args: any;
+    tid: number;
+    ts: number;
+    dur: number;
+  }
 
-export interface Results {
-  url: string;
-  audits: AuditFullResults;
-  lighthouseVersion: string;
-  artifacts?: Object;
-  initialUrl: string;
-  generatedTime: string;
-}
+  export interface NetworkRequest {
+    requestId: string;
+    connectionId: string;
+    connectionReused: boolean;
 
-export interface LaunchedChrome {
-  pid: number;
-  port: number;
-  kill: () => Promise<{}>;
-}
+    url: string;
+    protocol: string;
+    origin: string | null;
+    parsedURL: DevToolsParsedURL;
 
-export interface LighthouseError extends Error {
-  code?: string;
-  friendlyMessage?: string;
-}
+    startTime: number;
+    endTime: number;
 
-export interface TraceEvent {
-  name: string;
-  args: any;
-  tid: number;
-  ts: number;
-  dur: number;
-}
+    transferSize: number;
 
-export interface NetworkRequest {
-  requestId: string;
-  connectionId: string;
-  connectionReused: boolean;
+    _initiator: NetworkRequestInitiator;
+    _timing: NetworkRequestTiming;
+    _resourceType: any;
+    priority(): 'VeryHigh' | 'High' | 'Medium' | 'Low';
+  }
 
-  url: string;
-  protocol: string;
-  origin: string | null;
-  parsedURL: DevToolsParsedURL;
+  export interface NetworkRequestInitiator {
+    type: 'script' | 'parser';
+  }
 
-  startTime: number;
-  endTime: number;
+  export interface NetworkRequestTiming {
+    connectStart: number;
+    connectEnd: number
+    sslStart: number;
+    sslEnd: number;
+    sendStart: number;
+    sendEnd: number;
+    receiveHeadersEnd: number;
+  }
 
-  transferSize: number;
+  export interface DevToolsParsedURL {
+    scheme: string;
+    host: string;
+  }
 
-  _initiator: NetworkRequestInitiator;
-  _timing: NetworkRequestTiming;
-  _resourceType: any;
-  priority(): 'VeryHigh' | 'High' | 'Medium' | 'Low';
-}
-
-export interface NetworkRequestInitiator {
-  type: 'script' | 'parser';
-}
-
-export interface NetworkRequestTiming {
-  connectStart: number;
-  connectEnd: number
-  sslStart: number;
-  sslEnd: number;
-  sendStart: number;
-  sendEnd: number;
-  receiveHeadersEnd: number;
-}
-
-export interface DevToolsParsedURL {
-  scheme: string;
-  host: string;
-}
-
-export interface DevToolsJsonTarget {
-  description: string;
-  devtoolsFrontendUrl: string;
-  id: string;
-  title: string;
-  type: string;
-  url: string;
-  webSocketDebuggerUrl: string;
+  export interface DevToolsJsonTarget {
+    description: string;
+    devtoolsFrontendUrl: string;
+    id: string;
+    title: string;
+    type: string;
+    url: string;
+    webSocketDebuggerUrl: string;
+  }
 }
