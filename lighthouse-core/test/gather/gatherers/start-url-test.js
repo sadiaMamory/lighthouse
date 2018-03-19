@@ -81,7 +81,8 @@ describe('Start-url gatherer', () => {
       assert.equal(artifactWithQueryString.statusCode, -1);
       assert.ok(artifactWithQueryString.debugString, 'did not set debug string');
       assert.equal(artifactWithResponseNotFromSW.statusCode, -1);
-      assert.equal(artifactWithResponseNotFromSW.debugString, 'Unable to fetch start URL via service worker');
+      assert.equal(artifactWithResponseNotFromSW.debugString,
+          'Unable to fetch start URL via service worker');
     });
   });
 
@@ -139,7 +140,8 @@ describe('Start-url gatherer', () => {
     return startUrlGatherer.afterPass(options, tracingData)
       .then(artifact => {
         assert.equal(artifact.debugString,
-          `Error fetching web app manifest: ERROR: file isn't valid JSON: SyntaxError: Unexpected token h in JSON at position 1`);
+          `Error fetching web app manifest: ERROR: file isn't valid JSON: ` +
+          `SyntaxError: Unexpected token h in JSON at position 1`);
       });
   });
 
