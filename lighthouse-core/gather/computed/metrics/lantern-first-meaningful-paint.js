@@ -12,7 +12,7 @@ const NetworkNode = require('../../../lib/dependency-graph/network-node'); // es
 
 class FirstMeaningfulPaint extends MetricArtifact {
   get name() {
-    return 'FirstMeaningfulPaint';
+    return 'LanternFirstMeaningfulPaint';
   }
 
   /**
@@ -83,7 +83,7 @@ class FirstMeaningfulPaint extends MetricArtifact {
    * @return {Promise<LH.Gatherer.Artifact.LanternMetric>}
    */
   async compute_(data, artifacts) {
-    const fcpResult = await artifacts.requestFirstContentfulPaint(data, artifacts);
+    const fcpResult = await artifacts.requestLanternFirstContentfulPaint(data, artifacts);
     const metricResult = await this.computeMetricWithGraphs(data, artifacts);
     metricResult.timing = Math.max(metricResult.timing, fcpResult.timing);
     return metricResult;

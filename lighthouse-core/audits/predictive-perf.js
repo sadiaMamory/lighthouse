@@ -36,9 +36,9 @@ class PredictivePerf extends Audit {
   static async audit(artifacts) {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
     const devtoolsLog = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
-    const fcp = await artifacts.requestFirstContentfulPaint({trace, devtoolsLog});
-    const fmp = await artifacts.requestFirstMeaningfulPaint({trace, devtoolsLog});
-    const ttci = await artifacts.requestConsistentlyInteractive({trace, devtoolsLog});
+    const fcp = await artifacts.requestLanternFirstContentfulPaint({trace, devtoolsLog});
+    const fmp = await artifacts.requestLanternFirstMeaningfulPaint({trace, devtoolsLog});
+    const ttci = await artifacts.requestLanternConsistentlyInteractive({trace, devtoolsLog});
 
     const values = {
       roughEstimateOfFCP: fcp.timing,

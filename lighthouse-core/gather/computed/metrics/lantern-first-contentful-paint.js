@@ -12,7 +12,7 @@ const NetworkNode = require('../../../lib/dependency-graph/network-node'); // es
 
 class FirstContentfulPaint extends MetricArtifact {
   get name() {
-    return 'FirstContentfulPaint';
+    return 'LanternFirstContentfulPaint';
   }
 
   /**

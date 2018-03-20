@@ -6,7 +6,7 @@
 'use strict';
 
 const Audit = require('../audit');
-const ConsistentlyInteractive = require('../../gather/computed/metrics/consistently-interactive');
+const ConsistentlyInteractive = require('../../gather/computed/metrics/lantern-consistently-interactive'); // eslint-disable-line max-len
 const NetworkAnalysis = require('../../gather/computed/network-analysis');
 const LoadSimulator = require('../../lib/dependency-graph/simulator/simulator.js');
 

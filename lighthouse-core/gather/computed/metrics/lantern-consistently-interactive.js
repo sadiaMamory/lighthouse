@@ -16,7 +16,7 @@ const CRITICAL_LONG_TASK_THRESHOLD = 20;
 
 class ConsistentlyInteractive extends MetricArtifact {
   get name() {
-    return 'ConsistentlyInteractive';
+    return 'LanternConsistentlyInteractive';
   }
 
   /**
@@ -84,7 +84,7 @@ class ConsistentlyInteractive extends MetricArtifact {
    * @return {Promise<LH.Gatherer.Artifact.LanternMetric>}
    */
   async compute_(data, artifacts) {
-    const fmpResult = await artifacts.requestFirstMeaningfulPaint(data, artifacts);
+    const fmpResult = await artifacts.requestLanternFirstMeaningfulPaint(data, artifacts);
     const metricResult = await this.computeMetricWithGraphs(data, artifacts, {fmpResult});
     metricResult.timing = Math.max(metricResult.timing, fmpResult.timing);
     return metricResult;
