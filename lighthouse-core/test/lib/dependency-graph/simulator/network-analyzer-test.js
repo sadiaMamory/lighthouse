@@ -82,10 +82,34 @@ describe('DependencyGraph/Simulator/NetworkAnalyzer', () => {
 
     it('should estimate values when not trustworthy (connectionReused nonsense)', () => {
       const records = [
-        createRecord({requestId: 1, connectionId: 1, connectionReused: true, startTime: 0, endTime: 15}),
-        createRecord({requestId: 2, connectionId: 1, connectionReused: true, startTime: 10, endTime: 25}),
-        createRecord({requestId: 3, connectionId: 1, connectionReused: true, startTime: 20, endTime: 40}),
-        createRecord({requestId: 4, connectionId: 2, connectionReused: false, startTime: 30, endTime: 40}),
+        createRecord({
+          requestId: 1,
+          connectionId: 1,
+          connectionReused: true,
+          startTime: 0,
+          endTime: 15,
+        }),
+        createRecord({
+          requestId: 2,
+          connectionId: 1,
+          connectionReused: true,
+          startTime: 10,
+          endTime: 25,
+        }),
+        createRecord({
+          requestId: 3,
+          connectionId: 1,
+          connectionReused: true,
+          startTime: 20,
+          endTime: 40,
+        }),
+        createRecord({
+          requestId: 4,
+          connectionId: 2,
+          connectionReused: false,
+          startTime: 30,
+          endTime: 40,
+        }),
       ];
 
       const result = NetworkAnalyzer.estimateIfConnectionWasReused(records);
@@ -150,8 +174,16 @@ describe('DependencyGraph/Simulator/NetworkAnalyzer', () => {
     it('should handle untrustworthy connection information', () => {
       const timing = {sendStart: 100};
       const recordA = createRecord({startTime: 0, endTime: 1, timing, connectionReused: true});
-      const recordB =  createRecord({startTime: 0, endTime: 1, timing, connectionId: 2, connectionReused: true});
-      const result = NetworkAnalyzer.estimateRTTByOrigin([recordA, recordB], {coarseEstimateMultiplier: 1});
+      const recordB = createRecord({
+        startTime: 0,
+        endTime: 1,
+        timing,
+        connectionId: 2,
+        connectionReused: true,
+      });
+      const result = NetworkAnalyzer.estimateRTTByOrigin([recordA, recordB], {
+        coarseEstimateMultiplier: 1,
+      });
       const expected = {min: 50, max: 50, avg: 50, median: 50};
       assert.deepStrictEqual(result.get('https://example.com'), expected);
     });

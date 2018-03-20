@@ -192,14 +192,14 @@ class NetworkAnalyzer {
   static canTrustConnectionInformation(records) {
     const connectionIdWasStarted = new Map();
     for (const record of records) {
-      const wasStarted = connectionIdWasStarted.get(record.connectionId) || !record.connectionReused;
-      connectionIdWasStarted.set(record.connectionId, wasStarted);
+      const started = connectionIdWasStarted.get(record.connectionId) || !record.connectionReused;
+      connectionIdWasStarted.set(record.connectionId, started);
     }
 
     // We probably can't trust the network information if all the connection IDs were the same
     if (connectionIdWasStarted.size <= 1) return false;
     // Or if there were connections that were always reused (a connection had to have started at some point)
-    return Array.from(connectionIdWasStarted.values()).every(wasStarted => wasStarted)
+    return Array.from(connectionIdWasStarted.values()).every(started => started);
   }
 
   /**
