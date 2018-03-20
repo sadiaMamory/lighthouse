@@ -748,7 +748,7 @@ class Driver {
       /* eslint-enable max-len */
 
       await this._waitForFullyLoaded(pauseAfterLoadMs, networkQuietThresholdMs, cpuQuietThresholdMs,
-          maxWaitMs)
+          maxWaitMs);
     }
 
     return this._endNetworkStatusMonitoring();
