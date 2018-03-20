@@ -9,7 +9,7 @@ import * as _NetworkNode from '../lighthouse-core/lib/dependency-graph/network-n
 import * as _CPUNode from '../lighthouse-core/lib/dependency-graph/cpu-node';
 
 declare global {
-  namespace LH.Gatherer {
+  module LH.Gatherer {
     export interface PassContext {
       options: object;
     }
@@ -55,24 +55,10 @@ declare global {
     }
 
     namespace Simulation {
+      // HACK: TS treats 'import * as Foo' as namespace instead of a type, use typeof and prototype
       export type GraphNode = typeof _Node['prototype'];
       export type GraphNetworkNode = typeof _NetworkNode['prototype'];
       export type GraphCPUNode = typeof _CPUNode['prototype'];
-
-      // type GraphIterator = (node: Graph, path: Graph[]) => void;
-      // type GraphGetNext = (node: Graph) => Graph[];
-
-      // export interface Graph {
-      //   getDependents(): Graph[];
-      //   getDependencies(): Graph[];
-      //   getNumberOfDependencies(): number;
-      //   getRootNode(): Graph;
-      //   addDependent(node: Graph): void;
-      //   addDependency(node: Graph): void;
-      //   cloneWithoutRelationships(): Graph;
-      //   cloneWithRelationships(predicate: any): number;
-      //   traverse(iterator: GraphIterator, getNext: GraphGetNext): void;
-      // }
 
       export interface MetricCoefficients {
         intercept: number;
