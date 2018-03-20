@@ -50,7 +50,7 @@ function parseChromeFlags(flags = '') {
  * Attempts to connect to an instance of Chrome with an open remote-debugging
  * port. If none is found, launches a debuggable instance.
  * @param {!LH.Flags} flags
- * @return {!Promise<!LH.LaunchedChrome>}
+ * @return {!Promise<LH.LaunchedChrome>}
  */
 function getDebuggableChrome(flags) {
   return ChromeLauncher.launch({
@@ -149,7 +149,7 @@ function saveResults(results, artifacts, flags) {
  * @param {string} url
  * @param {!LH.Flags} flags
  * @param {!LH.Config|undefined} config
- * @return {!Promise<!LH.Results|void>}
+ * @return {!Promise<LH.Results|void>}
  */
 function runLighthouse(url, flags, config) {
   /** @type {!LH.LaunchedChrome} */

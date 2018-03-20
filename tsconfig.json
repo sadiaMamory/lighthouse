@@ -6,6 +6,7 @@
     "allowJs": true,
     "checkJs": true,
     "strict": true,
+    "allowSyntheticDefaultImports": true,
     // "listFiles": true,
     "typeRoots": [
       "@types",
@@ -18,6 +19,7 @@
     "lighthouse-cli/**/*.js",
     "lighthouse-core/audits/audit.js",
     "lighthouse-core/lib/dependency-graph/**/*.js",
+    "lighthouse-core/gather/computed/metrics/*.js",
     "lighthouse-core/gather/connections/**/*.js",
     "lighthouse-core/gather/gatherers/gatherer.js",
     "./typings/*.d.ts"

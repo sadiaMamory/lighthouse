@@ -1,12 +1,14 @@
 /**
- * @license Copyright 2017 Google Inc. All Rights Reserved.
+ * @license Copyright 2018 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 'use strict';
 
-const MetricArtifact = require('./metric');
+const MetricArtifact = require('./lantern-metric');
 const Node = require('../../../lib/dependency-graph/node');
+const CPUNode = require('../../../lib/dependency-graph/cpu-node'); // eslint-disable-line no-unused-vars
+const NetworkNode = require('../../../lib/dependency-graph/network-node'); // eslint-disable-line no-unused-vars
 const WebInspector = require('../../../lib/web-inspector');
 
 // Any CPU task of 20 ms or more will end up being a critical long task on mobile
@@ -18,7 +20,7 @@ class ConsistentlyInteractive extends MetricArtifact {
   }
 
   /**
-   * @return {MetricArtifact.MetricCoefficients}
+   * @return {LH.Gatherer.Simulation.MetricCoefficients}
    */
   get COEFFICIENTS() {
     return {
@@ -29,8 +31,8 @@ class ConsistentlyInteractive extends MetricArtifact {
   }
 
   /**
-   * @param {!Node} dependencyGraph
-   * @return {!Node}
+   * @param {Node} dependencyGraph
+   * @return {Node}
    */
   getOptimisticGraph(dependencyGraph) {
     // Adjust the critical long task threshold for microseconds
@@ -38,27 +40,33 @@ class ConsistentlyInteractive extends MetricArtifact {
 
     return dependencyGraph.cloneWithRelationships(node => {
       // Include everything that might be a long task
-      if (node.type === Node.TYPES.CPU) return node.event.dur > minimumCpuTaskDuration;
+      if (node.type === Node.TYPES.CPU) {
+        return /** @type {CPUNode} */ (node).event.dur > minimumCpuTaskDuration;
+      }
+
+      const asNetworkNode = /** @type {NetworkNode} */ (node);
       // Include all scripts and high priority requests, exclude all images
-      const isImage = node.record._resourceType === WebInspector.resourceTypes.Image;
-      const isScript = node.record._resourceType === WebInspector.resourceTypes.Script;
+      const isImage = asNetworkNode.record._resourceType === WebInspector.resourceTypes.Image;
+      const isScript = asNetworkNode.record._resourceType === WebInspector.resourceTypes.Script;
       return (
         !isImage &&
-        (isScript || node.record.priority() === 'High' || node.record.priority() === 'VeryHigh')
+        (isScript ||
+          asNetworkNode.record.priority() === 'High' ||
+          asNetworkNode.record.priority() === 'VeryHigh')
       );
     });
   }
 
   /**
-   * @param {!Node} dependencyGraph
-   * @return {!Node}
+   * @param {Node} dependencyGraph
+   * @return {Node}
    */
   getPessimisticGraph(dependencyGraph) {
     return dependencyGraph;
   }
 
   /**
-   * @param {SimulationResult} simulationResult
+   * @param {LH.Gatherer.Simulation.Result} simulationResult
    * @param {Object} extras
    * @return {number}
    */
@@ -73,7 +81,7 @@ class ConsistentlyInteractive extends MetricArtifact {
   /**
    * @param {{trace: Object, devtoolsLog: Object}} data
    * @param {Object} artifacts
-   * @return {Promise<MetricResult>}
+   * @return {Promise<LH.Gatherer.Artifact.LanternMetric>}
    */
   async compute_(data, artifacts) {
     const fmpResult = await artifacts.requestFirstMeaningfulPaint(data, artifacts);
@@ -83,17 +91,19 @@ class ConsistentlyInteractive extends MetricArtifact {
   }
 
   /**
-   * @param {!Map<!Node, {startTime, endTime}>} nodeTiming
+   * @param {Map<Node, {startTime?: number, endTime?: number}>} nodeTiming
    * @return {number}
    */
   static getLastLongTaskEndTime(nodeTiming, duration = 50) {
+    // @ts-ignore TS can't infer how the object invariants change
     return Array.from(nodeTiming.entries())
-      .filter(
-        ([node, timing]) =>
-          node.type === Node.TYPES.CPU && timing.endTime - timing.startTime > duration
-      )
+      .filter(([node, timing]) => {
+        if (node.type !== Node.TYPES.CPU) return false;
+        if (!timing.endTime || !timing.startTime) return false;
+        return timing.endTime - timing.startTime > duration;
+      })
       .map(([_, timing]) => timing.endTime)
-      .reduce((max, x) => Math.max(max, x), 0);
+      .reduce((max, x) => Math.max(max || 0, x || 0), 0);
   }
 }
 

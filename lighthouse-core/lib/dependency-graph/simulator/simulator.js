@@ -36,7 +36,7 @@ const NodeState = {
 class Simulator {
   /**
    * @param {Node} graph
-   * @param {SimulationOptions} [options]
+   * @param {LH.Gatherer.Simulation.Options} [options]
    */
   constructor(graph, options) {
     this._graph = graph;
@@ -105,7 +105,7 @@ class Simulator {
 
   /**
    * @param {Node} node
-   * @param {NodeTimingData} values
+   * @param {LH.Gatherer.Simulation.NodeTiming} values
    */
   _setTimingData(node, values) {
     const timingData = this._nodeTiming.get(node) || {};
@@ -288,7 +288,7 @@ class Simulator {
 
   /**
    * Estimates the time taken to process all of the graph's nodes.
-   * @return {SimulationResult}
+   * @return {LH.Gatherer.Simulation.Result}
    */
   simulate() {
     // initialize the necessary data containers
@@ -342,30 +342,3 @@ class Simulator {
 }
 
 module.exports = Simulator;
-
-/**
- * @typedef NodeTimingData
- * @property {number} [startTime]
- * @property {number} [endTime]
- * @property {number} [queuedTime]
- * @property {number} [estimatedTimeElapsed]
- * @property {number} [timeElapsed]
- * @property {number} [timeElapsedOvershoot]
- * @property {number} [bytesDownloaded]
- */
-
-/**
- * @typedef SimulationOptions
- * @property {number} [rtt]
- * @property {number} [throughput]
- * @property {number} [fallbackTTFB]
- * @property {number} [maximumConcurrentRequests]
- * @property {number} [cpuTaskMultiplier]
- * @property {number} [layoutTaskMultiplier]
- */
-
-/**
- * @typedef SimulationResult
- * @property {number} timeInMs
- * @property {Map<Node, NodeTimingData>} nodeTiming
- */

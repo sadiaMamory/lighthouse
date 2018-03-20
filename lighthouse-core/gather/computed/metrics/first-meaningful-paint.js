@@ -1,12 +1,14 @@
 /**
- * @license Copyright 2017 Google Inc. All Rights Reserved.
+ * @license Copyright 2018 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 'use strict';
 
-const MetricArtifact = require('./metric');
+const MetricArtifact = require('./lantern-metric');
 const Node = require('../../../lib/dependency-graph/node');
+const CPUNode = require('../../../lib/dependency-graph/cpu-node'); // eslint-disable-line no-unused-vars
+const NetworkNode = require('../../../lib/dependency-graph/network-node'); // eslint-disable-line no-unused-vars
 
 class FirstMeaningfulPaint extends MetricArtifact {
   get name() {
@@ -14,7 +16,7 @@ class FirstMeaningfulPaint extends MetricArtifact {
   }
 
   /**
-   * @return {MetricArtifact.MetricCoefficients}
+   * @return {LH.Gatherer.Simulation.MetricCoefficients}
    */
   get COEFFICIENTS() {
     return {
@@ -26,12 +28,12 @@ class FirstMeaningfulPaint extends MetricArtifact {
 
   /**
    * @param {!Node} dependencyGraph
-   * @param {!TraceOfTabArtifact} traceOfTab
+   * @param {LH.Gatherer.Artifact.TraceOfTab} traceOfTab
    * @return {!Node}
    */
   getOptimisticGraph(dependencyGraph, traceOfTab) {
     const fmp = traceOfTab.timestamps.firstMeaningfulPaint;
-    const requiredScriptUrls = MetricArtifact.getScriptUrls(dependencyGraph, node => {
+    const blockingScriptUrls = MetricArtifact.getScriptUrls(dependencyGraph, node => {
       return (
         node.endTime <= fmp && node.hasRenderBlockingPriority() && node.initiatorType !== 'script'
       );
@@ -40,15 +42,19 @@ class FirstMeaningfulPaint extends MetricArtifact {
     return dependencyGraph.cloneWithRelationships(node => {
       if (node.endTime > fmp) return false;
       // Include EvaluateScript tasks for blocking scripts
-      if (node.type === Node.TYPES.CPU) return node.isEvaluateScriptFor(requiredScriptUrls);
+      if (node.type === Node.TYPES.CPU) {
+        return /** @type {CPUNode} */ (node).isEvaluateScriptFor(blockingScriptUrls);
+      }
+
+      const asNetworkNode = /** @type {NetworkNode} */ (node);
       // Include non-script-initiated network requests with a render-blocking priority
-      return node.hasRenderBlockingPriority() && node.initiatorType !== 'script';
+      return asNetworkNode.hasRenderBlockingPriority() && asNetworkNode.initiatorType !== 'script';
     });
   }
 
   /**
    * @param {!Node} dependencyGraph
-   * @param {!TraceOfTabArtifact} traceOfTab
+   * @param {LH.Gatherer.Artifact.TraceOfTab} traceOfTab
    * @return {!Node}
    */
   getPessimisticGraph(dependencyGraph, traceOfTab) {
@@ -62,18 +68,19 @@ class FirstMeaningfulPaint extends MetricArtifact {
 
       // Include CPU tasks that performed a layout or were evaluations of required scripts
       if (node.type === Node.TYPES.CPU) {
-        return node.didPerformLayout() || node.isEvaluateScriptFor(requiredScriptUrls);
+        const asCpuNode = /** @type {CPUNode} */ (node);
+        return asCpuNode.didPerformLayout() || asCpuNode.isEvaluateScriptFor(requiredScriptUrls);
       }
 
       // Include all network requests that had render-blocking priority (even script-initiated)
-      return node.hasRenderBlockingPriority();
+      return /** @type {NetworkNode} */ (node).hasRenderBlockingPriority();
     });
   }
 
   /**
    * @param {{trace: Object, devtoolsLog: Object}} data
    * @param {Object} artifacts
-   * @return {Promise<MetricResult>}
+   * @return {Promise<LH.Gatherer.Artifact.LanternMetric>}
    */
   async compute_(data, artifacts) {
     const fcpResult = await artifacts.requestFirstContentfulPaint(data, artifacts);
