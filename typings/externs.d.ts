@@ -38,7 +38,12 @@ declare global {
       disableNetworkThrottling?: boolean;
     }
 
+    // TODO: type checking for Config
     export interface Config {
+      passes: ConfigPass[];
+    }
+
+    export interface ConfigPass {
       pauseAfterLoadMs?: number;
       networkQuietThresholdMs?: number;
       cpuQuietThresholdMs?: number;

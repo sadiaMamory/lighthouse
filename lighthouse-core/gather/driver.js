@@ -717,7 +717,7 @@ class Driver {
    * possible workaround.
    * Resolves on the url of the loaded page, taking into account any redirects.
    * @param {string} url
-   * @param {{waitForLoad?: boolean, disableJavaScript?: boolean, config?: LH.Config, flags?: LH.Flags}} options
+   * @param {{waitForLoad?: boolean, disableJavaScript?: boolean, config?: LH.ConfigPass, flags?: LH.Flags}} options
    * @return {Promise<string>}
    */
   async gotoURL(url, options = {}) {
@@ -1058,7 +1058,7 @@ class Driver {
   /**
    * Enable internet connection, using emulated mobile settings if
    * `options.flags.disableNetworkThrottling` is false.
-   * @param {{flags: LH.Flags, config: LH.Config}} options
+   * @param {{flags: LH.Flags, config: LH.ConfigPass}} options
    * @return {Promise<void>}
    */
   async goOnline(options) {
