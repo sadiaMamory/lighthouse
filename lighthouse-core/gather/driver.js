@@ -16,9 +16,9 @@ const TraceParser = require('../lib/traces/trace-parser');
 const log = require('lighthouse-logger');
 const DevtoolsLog = require('./devtools-log');
 
-const inPageHelpers = require('../lib/driver-page-helpers.js');
+const inPageHelpers = require('../lib/page-functions.js');
 
-// Used for type checking.
+// Pulled in for Connection type checking.
 // eslint-disable-next-line no-unused-vars
 const Connection = require('./connections/connection.js');
 
