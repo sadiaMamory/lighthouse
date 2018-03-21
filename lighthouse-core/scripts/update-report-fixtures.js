@@ -19,13 +19,11 @@ async function update() {
 
   const url = `http://localhost:${port}/dobetterweb/dbw_tester.html`;
   const flags = {
-    gatherMode: 'lighthouse-cli/test/sample_artifacts',
+    gatherMode: 'lighthouse-core/test/results/artifacts',
   };
   // @ts-ignore Remove when we fix Flags typing
   await cli.runLighthouse(url, flags, undefined);
   await new Promise(res => server.close(res));
 }
 
-(async function() {
-  await update();
-})();
+update();
