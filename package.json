@@ -29,6 +29,7 @@
     "debug": "node --inspect-brk ./lighthouse-cli/index.js",
     "start": "node ./lighthouse-cli/index.js",
     "test": "yarn lint --quiet && yarn unit && yarn type-check && yarn closure",
+    "test-extension": "cd lighthouse-extension && yarn test",
     "unit-core": "bash lighthouse-core/scripts/run-mocha.sh --core",
     "unit-cli": "bash lighthouse-core/scripts/run-mocha.sh --cli",
     "unit-viewer": "bash lighthouse-core/scripts/run-mocha.sh --viewer",
@@ -50,7 +51,8 @@
     "type-check": "tsc -p .",
     "update:sample-artifacts": "node lighthouse-core/scripts/update-report-fixtures.js -G",
     "update:sample-json": "node ./lighthouse-cli -A=./lighthouse-core/test/results/artifacts --output=json --output-path=./lighthouse-core/test/results/sample_v2.json http://localhost/dobetterweb/dbw_tester.html",
-    "mixed-content": "./lighthouse-cli/index.js --chrome-flags='--headless' --config-path=./lighthouse-core/config/mixed-content.js"
+    "mixed-content": "./lighthouse-cli/index.js --chrome-flags='--headless' --config-path=./lighthouse-core/config/mixed-content.js",
+    "prepare": "patch-package"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.60",
@@ -78,8 +80,11 @@
     "jsdom": "^9.12.0",
     "mocha": "^3.2.0",
     "npm-run-posix-or-windows": "^2.0.2",
+    "postinstall-prepare": "^1.0.1",
+    "puppeteer": "^1.1.1",
     "sinon": "^2.3.5",
     "typescript": "^2.8.0-rc",
+    "vscode-chrome-debug-core": "^3.23.8",
     "zone.js": "^0.7.3"
   },
   "dependencies": {
@@ -99,6 +104,7 @@
     "mkdirp": "0.5.1",
     "opn": "4.0.2",
     "parse-cache-control": "1.0.1",
+    "patch-package": "^5.1.1",
     "raven": "^2.2.1",
     "rimraf": "^2.6.1",
     "robots-parser": "^1.0.2",

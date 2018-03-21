@@ -66,11 +66,20 @@ class Runner {
     // Gather phase
     // Either load saved artifacts off disk, from config, or get from the browser
     if (opts.flags.auditMode && !opts.flags.gatherMode) {
-      run = run.then(_ => Runner._loadArtifactsFromDisk(Runner._getArtifactsPath(opts.flags)));
+      const path = Runner._getArtifactsPath(opts.flags);
+      run = run.then(_ => Runner._loadArtifactsFromDisk(path));
     } else if (opts.config.artifacts) {
       run = run.then(_ => opts.config.artifacts);
     } else {
       run = run.then(_ => Runner._gatherArtifactsFromBrowser(opts, connection));
+      // -G means save these to ./latest-run, etc.
+      if (opts.flags.gatherMode) {
+        run = run.then(async artifacts => {
+          const path = Runner._getArtifactsPath(opts.flags);
+          await Runner._saveArtifacts(artifacts, path);
+          return artifacts;
+        });
+      }
     }
 
     // Potentially quit early
@@ -96,11 +105,11 @@ class Runner {
         Runner._scoreAndCategorize(opts, resultsById);
         categories = Object.values(opts.config.categories);
       }
-
       return {
         userAgent: runResults.artifacts.UserAgent,
         lighthouseVersion: require('../package').version,
-        generatedTime: (new Date()).toJSON(),
+        fetchedAt: runResults.artifacts.fetchedAt,
+        generatedTime: 'Please use .fetchedAt instead',
         initialUrl: opts.initialUrl,
         url: opts.url,
         runWarnings: lighthouseRunWarnings,
@@ -134,19 +143,13 @@ class Runner {
    * @param {*} connection
    * @return {!Promise<!Artifacts>}
    */
-  static _gatherArtifactsFromBrowser(opts, connection) {
+  static async _gatherArtifactsFromBrowser(opts, connection) {
     if (!opts.config.passes) {
       return Promise.reject(new Error('No browser artifacts are either provided or requested.'));
     }
 
     opts.driver = opts.driverMock || new Driver(connection);
-    return GatherRunner.run(opts.config.passes, opts).then(artifacts => {
-      const flags = opts.flags;
-      const shouldSave = flags.gatherMode;
-      const path = Runner._getArtifactsPath(flags);
-      const p = shouldSave ? Runner._saveArtifacts(artifacts, path): Promise.resolve();
-      return p.then(_ => artifacts);
-    });
+    return GatherRunner.run(opts.config.passes, opts);
   }
 
   /**
@@ -414,13 +417,13 @@ class Runner {
 
   /**
    * Get path to use for -G and -A modes. Defaults to $CWD/latest-run
-   * @param {*} flags
+   * @param {Flags} flags
    * @return {string}
    */
   static _getArtifactsPath(flags) {
     // This enables usage like: -GA=./custom-folder
-    if (typeof flags.auditMode === 'string') return path.join(process.cwd(), flags.auditMode);
-    if (typeof flags.gatherMode === 'string') return path.join(process.cwd(), flags.gatherMode);
+    if (typeof flags.auditMode === 'string') return path.resolve(process.cwd(), flags.auditMode);
+    if (typeof flags.gatherMode === 'string') return path.resolve(process.cwd(), flags.gatherMode);
     return path.join(process.cwd(), 'latest-run');
   }
 }
