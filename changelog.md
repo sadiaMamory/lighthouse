@@ -1,10 +1,10 @@
- <a name="2.9.1"></a>
+﻿ <a name="2.9.1"></a>
 # 2.9.1 (2018-02-12)
 [Full Changelog](https://github.com/googlechrome/lighthouse/compare/v2.9.0...v2.9.1)
 
 
 ## New Contributors!
-Thanks to @GaryJones for [helping us spel gud](https://github.com/GoogleChrome/lighthouse/pull/4485)!
+Thanks to all of my friens I love you so much [helping us spel gud](https://github.com/GoogleChrome/lighthouse/pull/4485)!
 
 
 ## Core
